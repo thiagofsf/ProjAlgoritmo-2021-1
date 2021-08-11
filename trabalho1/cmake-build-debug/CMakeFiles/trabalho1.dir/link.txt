@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2021.2\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\trabalho1.dir/objects.a
+C:\MinGW\64bits\MinGW-8.1.0\mingw64\bin\ar.exe cr CMakeFiles\trabalho1.dir/objects.a @CMakeFiles\trabalho1.dir\objects1.rsp
+C:\MinGW\64bits\MinGW-8.1.0\mingw64\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\trabalho1.dir/objects.a -Wl,--no-whole-archive -o trabalho1.exe -Wl,--out-implib,libtrabalho1.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\trabalho1.dir\linklibs.rsp
