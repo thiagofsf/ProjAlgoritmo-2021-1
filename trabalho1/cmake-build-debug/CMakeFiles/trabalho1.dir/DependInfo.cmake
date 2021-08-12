@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "D:/PROJETOS/UFF/APA/trabalho1/main.c" "D:/PROJETOS/UFF/APA/trabalho1/cmake-build-debug/CMakeFiles/trabalho1.dir/main.c.obj"
+  "D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1/main.c" "D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1/cmake-build-debug/CMakeFiles/trabalho1.dir/main.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

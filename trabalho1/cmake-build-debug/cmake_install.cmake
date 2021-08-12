@@ -1,4 +1,4 @@
-# Install script for directory: D:/PROJETOS/UFF/APA/trabalho1
+# Install script for directory: D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/PROJETOS/UFF/APA/trabalho1/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

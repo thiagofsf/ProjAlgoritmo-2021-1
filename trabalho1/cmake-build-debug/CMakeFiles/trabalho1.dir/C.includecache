@@ -6,9 +6,11 @@
 
 #IncludeRegexTransform: 
 
-D:/PROJETOS/UFF/APA/trabalho1/main.c
+D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1/main.c
 stdio.h
 -
 stdlib.h
+-
+time.h
 -
 

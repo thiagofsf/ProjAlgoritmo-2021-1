@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int** cria_matriz(int n, int valor);
 void popula_matriz(int n, int valor, int **matriz);
@@ -8,6 +9,7 @@ int** multiplica_matrizes(int n, int **A, int **B);
 int** dividir_matriz(int n, int **mat, int lin, int col);
 int** multiplica_strassen(int n, int **A, int **B);
 int** multiplica_strassen_rec(int n, int **A, int** BB);
+int** multiplica_divconq(int n, int **A, int **B);
 void compor_matriz(int n, int** A, int** B,int lin,int col);
 
 
@@ -31,19 +33,35 @@ int main() {
     b = cria_matriz(n, vb);
 
     printf("\nImprimindo Matriz A:\n");
-    imprime_matriz(n, a);
+    //imprime_matriz(n, a);
     printf("\nImprimindo Matriz B:\n");
-    imprime_matriz(n, b);
+    //imprime_matriz(n, b);
     //printf("\nImprimindo Matriz C:\n");
     //imprime_matriz(n, c);
 
     printf("\nImprimindo Matriz C = A x B, Calculada por algoritmo Normal de multiplicação\n");
+    clock_t begin = clock();
     int **c = multiplica_matrizes(n, a, b);
-    imprime_matriz(n, c);
+    clock_t end = clock();
+    double temponormal = (double)(end-begin)/CLOCKS_PER_SEC;
+    //imprime_matriz(n, c);
 
-    printf("\nImprimindo Matriz D = A x B, Calculada por algoritmo Strassen de multiplicação\n");
-    int **d = multiplica_strassen(n, a, b);
-    imprime_matriz(n, d);
+    printf("\nImprimindo Matriz D = A x B, Calculada por algoritmo Normal de Divisão e Conquista\n");
+    begin = clock();
+    int **d = multiplica_divconq(n, a, b);
+    end = clock();
+    double tempondivconq = (double)(end-begin)/CLOCKS_PER_SEC;
+    //imprime_matriz(n, d);
+
+    printf("\nImprimindo Matriz E = A x B, Calculada por algoritmo Strassen de multiplicação\n");
+    begin = clock();
+    int **e = multiplica_strassen(n, a, b);
+    end = clock();
+    double tempostrassen = (double)(end-begin)/CLOCKS_PER_SEC;
+    //imprime_matriz(n, e);
+    printf("\nTempo de execução do algoritmo comum: %f", temponormal);
+    printf("\nTempo de execução do algoritmo Divisão e Conquista Comum: %f", tempondivconq);
+    printf("\nTempo de execução do algoritmo strassen: %f", tempostrassen);
 
 }
 
@@ -159,6 +177,40 @@ int** subtrai_matriz(int n, int** A, int** B){
         for(j=0;j<n;j++){
             C[i][j]=A[i][j]-B[i][j];
         }
+    }
+    return C;
+}
+
+int** multiplica_divconq(int n, int **A, int **B){
+    //Cria Matriz Resposta C e a popula com zeros
+    int **C = cria_matriz(n, 0);
+
+    //Se n for maior que 1, divide a matriz
+    if(n>1) {
+        int ** a11 = dividir_matriz(n, A, 0, 0);
+        int ** a12 = dividir_matriz(n, A, 0, (n/2));
+        int ** a21 = dividir_matriz(n, A, (n/2), 0);
+        int ** a22 = dividir_matriz(n, A, (n/2), (n/2));
+        int ** b11 = dividir_matriz(n, B, 0, 0);
+        int ** b12 = dividir_matriz(n, B, 0, n/2);
+        int ** b21 = dividir_matriz(n, B, n/2, 0);
+        int ** b22 = dividir_matriz(n, B, n/2, n/2);
+
+        //Chamada Recursiva para dividir e conquistar
+        int ** c11 = soma_matriz(n/2, multiplica_divconq(n/2, a11, b11), multiplica_divconq(n/2, a12, b21));
+        int ** c12 = soma_matriz(n/2, multiplica_divconq(n/2, a11, b12), multiplica_divconq(n/2, a12, b22));
+        int ** c21 = soma_matriz(n/2, multiplica_divconq(n/2, a21, b11), multiplica_divconq(n/2, a22, b21));
+        int ** c22 = soma_matriz(n/2, multiplica_divconq(n/2, a21, b12), multiplica_divconq(n/2, a22, b22));
+
+        //Compor (juntar) as Matrizes
+        compor_matriz(n/2, c11, C, 0, 0);
+        compor_matriz(n/2, c12, C,0,n/2);
+        compor_matriz(n/2, c21, C, n/2, 0);
+        compor_matriz(n/2, c22, C, n/2, n/2);
+    }
+    else {
+        //This is the terminating condition for recurssion.
+        C[0][0] = A[0][0] * B[0][0];
     }
     return C;
 }
