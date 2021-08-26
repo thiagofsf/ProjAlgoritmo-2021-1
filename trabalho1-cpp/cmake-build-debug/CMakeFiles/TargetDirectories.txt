@@ -1,0 +1,3 @@
+D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1-cpp/cmake-build-debug/CMakeFiles/trabalho1_cpp.dir
+D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1-cpp/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/PROJETOS/UFF/APA/ProjAlgoritmo-2021-1/trabalho1-cpp/cmake-build-debug/CMakeFiles/rebuild_cache.dir

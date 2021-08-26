@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
+#include <sys/resource.h>
 
 int** cria_matriz(int n, int valor);
 void popula_matriz(int n, int valor, int **matriz);
@@ -11,58 +13,119 @@ int** multiplica_strassen(int n, int **A, int **B);
 int** multiplica_strassen_rec(int n, int **A, int** BB);
 int** multiplica_divconq(int n, int **A, int **B);
 void compor_matriz(int n, int** A, int** B,int lin,int col);
-
+void Tempo_CPU_Sistema(double *seg_CPU_total, double *seg_sistema_total);
 
 int main() {
+    printf ("Comparação de Algoritmos para Multiplicação de Matrizes\n\n");
 
     //Inicialização de Variaveis
-    int n, va, vb, i, j;
+    int n, k, va, vb, i, j, escreve;
     int **a, **b;
+    double s_CPU_inicial=0, s_total_inicial=0, s_CPU_final=0, s_total_final=0;
 
-    //Interacao com o usuario: Definindo tamanho e valores presentes na matriz A e B
-    printf ("Defina o n para o tamanho nxn da matriz: ");
-    scanf ("%d", &n);
-    printf ("\nDefina o Valor para o popular a matriz A: ");
-    scanf ("%d", &va);
-    printf ("\nDefina o Valor para o popular a matriz B: ");
-    scanf ("%d", &vb);
+    FILE *arq;
+    arq = fopen("resultado.txt", "a+");
+    if(arq == NULL){
+        printf("Problemas na CRIACAO/ABERTURA do arquivo\n");
+        return 0;
+    }
+    char resultado[100];
+    char temp[100];
 
-    //criando e populando matriz A:
-    a = cria_matriz(n, va);
-    //criando e populando matriz B:
-    b = cria_matriz(n, vb);
+    escreve = fprintf(arq, "\n\n\n[ ['Tamanho da Matriz', 'Algoritmo Direto', 'Strassen'], \n");
+    if(escreve == EOF){
+        printf("Erro na Gravacao\n");
+    }
 
-    printf("\nImprimindo Matriz A:\n");
-    //imprime_matriz(n, a);
-    printf("\nImprimindo Matriz B:\n");
-    //imprime_matriz(n, b);
-    //printf("\nImprimindo Matriz C:\n");
-    //imprime_matriz(n, c);
+    //LOOP PRINCIPAL
+    int controle = 1;
+    while(controle!=0){
+        //Interacao com o usuario: Definindo tamanho e valores presentes na matriz A e B
+        printf ("Defina o k para tamanho 2^k x 2^k da matriz: ");
+        scanf ("%d", &k);
+        printf ("\nDefina o Valor para o popular a matriz A: ");
+        scanf ("%d", &va);
+        printf ("\nDefina o Valor para o popular a matriz B: ");
+        scanf ("%d", &vb);
 
-    printf("\nImprimindo Matriz C = A x B, Calculada por algoritmo Normal de multiplicação\n");
-    clock_t begin = clock();
-    int **c = multiplica_matrizes(n, a, b);
-    clock_t end = clock();
-    double temponormal = (double)(end-begin)/CLOCKS_PER_SEC;
-    //imprime_matriz(n, c);
+        //Define n = 2^k
+        n = pow(2, k);
 
-    printf("\nImprimindo Matriz D = A x B, Calculada por algoritmo Normal de Divisão e Conquista\n");
-    begin = clock();
-    int **d = multiplica_divconq(n, a, b);
-    end = clock();
-    double tempondivconq = (double)(end-begin)/CLOCKS_PER_SEC;
-    //imprime_matriz(n, d);
+        escreve = fprintf(arq, "[' %d x %d ', ",n,n);
+        if(escreve == EOF){
+            printf("Erro na Gravacao\n");
+        }
 
-    printf("\nImprimindo Matriz E = A x B, Calculada por algoritmo Strassen de multiplicação\n");
-    begin = clock();
-    int **e = multiplica_strassen(n, a, b);
-    end = clock();
-    double tempostrassen = (double)(end-begin)/CLOCKS_PER_SEC;
-    //imprime_matriz(n, e);
-    printf("\nTempo de execução do algoritmo comum: %f", temponormal);
-    printf("\nTempo de execução do algoritmo Divisão e Conquista Comum: %f", tempondivconq);
-    printf("\nTempo de execução do algoritmo strassen: %f", tempostrassen);
+        //criando e populando matriz A:
+        a = cria_matriz(n, va);
+        //criando e populando matriz B:
+        b = cria_matriz(n, vb);
 
+        //printf("\nImprimindo Matriz A:\n");
+        //imprime_matriz(n, a);
+        //printf("\nImprimindo Matriz B:\n");
+        //imprime_matriz(n, b);
+
+        printf("\nCriando Matriz C = A x B, Calculada por algoritmo Direto de multiplicação\n");
+        Tempo_CPU_Sistema(&s_CPU_inicial, &s_total_inicial);
+        int **c = multiplica_matrizes(n, a, b);
+        Tempo_CPU_Sistema(&s_CPU_final, &s_total_final);
+        double temponormal = s_CPU_final - s_CPU_inicial;
+        //imprime_matriz(n, c);
+
+        /*
+        printf("\nCriando Matriz D = A x B, Calculada por algoritmo Normal de Divisão e Conquista\n");
+        Tempo_CPU_Sistema(&s_CPU_inicial, &s_total_inicial);
+        int **d = multiplica_divconq(n, a, b);
+        Tempo_CPU_Sistema(&s_CPU_final, &s_total_final);
+        double tempondivconq = s_CPU_final - s_CPU_inicial;
+        //imprime_matriz(n, d);
+        */
+
+        printf("\nCriando Matriz E = A x B, Calculada por algoritmo Strassen de multiplicação\n");
+        Tempo_CPU_Sistema(&s_CPU_inicial, &s_total_inicial);
+        int **e = multiplica_strassen(n, a, b);
+        Tempo_CPU_Sistema(&s_CPU_final, &s_total_final);
+        double tempostrassen = s_CPU_final - s_CPU_inicial;
+        //imprime_matriz(n, e);
+
+        printf("\nTempo de execução do algoritmo Direto: %f", temponormal);
+        //printf("\nTempo de execução do algoritmo Divisão e Conquista Comum: %f", tempondivconq);
+        printf("\nTempo de execução do algoritmo strassen: %f", tempostrassen);
+
+        escreve = fprintf(arq, " %f , ", temponormal);
+        if(escreve == EOF){
+            printf("Erro na Gravacao\n");
+        }
+        /*
+        escreve = fprintf(arq, "' %f ', ", tempondivconq);
+        if(escreve == EOF){
+            printf("Erro na Gravacao\n");
+        }
+        */
+        escreve = fprintf(arq, " %f ", tempostrassen);
+        if(escreve == EOF){
+            printf("Erro na Gravacao\n");
+        }
+
+        escreve = fprintf(arq, "], \n");
+        if(escreve == EOF){
+            printf("Erro na Gravacao\n");
+        }
+
+        fflush(arq);
+
+        printf("\n\nReiniciar procedimento: 1");
+        printf("\nEncerrar programa: 0:");
+        printf("\nEscolha uma opção:");
+        scanf ("%d", &controle);
+    }
+    escreve = fprintf(arq, "]");
+    if(escreve == EOF){
+        printf("Erro na Gravacao\n");
+    }
+    fclose(arq);
+    return 0;
 }
 
 //Função que cria uma matriz e a preenche com zeros;
@@ -186,7 +249,7 @@ int** multiplica_divconq(int n, int **A, int **B){
     int **C = cria_matriz(n, 0);
 
     //Se n for maior que 1, divide a matriz
-    if(n>1) {
+    if(n>64) {
         int ** a11 = dividir_matriz(n, A, 0, 0);
         int ** a12 = dividir_matriz(n, A, 0, (n/2));
         int ** a21 = dividir_matriz(n, A, (n/2), 0);
@@ -209,8 +272,7 @@ int** multiplica_divconq(int n, int **A, int **B){
         compor_matriz(n/2, c22, C, n/2, n/2);
     }
     else {
-        //This is the terminating condition for recurssion.
-        C[0][0] = A[0][0] * B[0][0];
+        multiplica_matrizes(n, A, B);
     }
     return C;
 }
@@ -232,8 +294,8 @@ int** multiplica_strassen_rec(int n, int **A, int** B){
     //Cria Matriz Resposta C e a popula com zeros
     int **C = cria_matriz(n, 0);
 
-    //Se n for maior que 1, divide a matriz
-    if(n>1) {
+    //Se n for maior que 64, divide a matriz
+    if(n>64) {
         int ** a11 = dividir_matriz(n, A, 0, 0);
         int ** a12 = dividir_matriz(n, A, 0, (n/2));
         int ** a21 = dividir_matriz(n, A, (n/2), 0);
@@ -263,8 +325,8 @@ int** multiplica_strassen_rec(int n, int **A, int** B){
         compor_matriz(n/2, c22, C, n/2, n/2);
     }
     else {
-        //This is the terminating condition for recurssion.
-        C[0][0] = A[0][0] * B[0][0];
+        //Condição para fim da recursão.
+        multiplica_matrizes(n, A, B);
     }
     return C;
 }
@@ -282,4 +344,19 @@ void compor_matriz(int n, int** A, int** B,int lin,int col){
         }
         l++;
     }
+}
+void Tempo_CPU_Sistema(double *seg_CPU_total, double *seg_sistema_total)
+{
+    long seg_CPU, seg_sistema, mseg_CPU, mseg_sistema;
+    struct rusage ptempo;
+
+    getrusage(0,&ptempo);
+
+    seg_CPU = ptempo.ru_utime.tv_sec;
+    mseg_CPU = ptempo.ru_utime.tv_usec;
+    seg_sistema = ptempo.ru_stime.tv_sec;
+    mseg_sistema = ptempo.ru_stime.tv_usec;
+
+    *seg_CPU_total     = (seg_CPU + 0.000001 * mseg_CPU);
+    *seg_sistema_total = (seg_sistema + 0.000001 * mseg_sistema);
 }
